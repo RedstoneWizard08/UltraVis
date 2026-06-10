@@ -88,7 +88,7 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
     while let Ok((i, data)) = rx.recv() {
         buf.insert(i, data);
 
-        if let Some((info, data)) = buf.remove(&pos) {
+        while let Some((info, data)) = buf.remove(&pos) {
             enc.encode(&data, info.pos)?;
             pos += 1;
         }
