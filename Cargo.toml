@@ -11,7 +11,7 @@ clap = { version = "4.6.1", features = ["derive"] }
 color-eyre = "0.6.5"
 crossbeam = { version = "0.8.4", features = ["crossbeam-channel"] }
 eyre = "0.6.12"
-ffmpeg-next = "8.1.0"
+ffmpeg-next = { version = "8.1.0", path = "deps/rust-ffmpeg", features = ["build"] }
 font-kit = { version = "0.14.3", features = ["freetype"] }
 indicatif = { version = "0.18.4", features = ["rayon"] }
 itertools = "0.14.0"
@@ -22,6 +22,10 @@ raqote = "0.8.5"
 rayon = "1.12.0"
 thiserror = "2.0.18"
 video-rs = { version = "0.11.0", features = ["ndarray"] }
+
+[patch.crates-io]
+ffmpeg-next = { version = "8.1.0", path = "deps/rust-ffmpeg" }
+ffmpeg-sys-next = { version = "8.1.0", path = "deps/rust-ffmpeg-sys" }
 
 [profile.release]
 opt-level = 3

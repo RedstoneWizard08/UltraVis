@@ -1,0 +1,6 @@
+[build]
+# zig = true
+pre-build = [
+  "apt-get update",
+  "apt-get -y install clang build-essential gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 gcc-mingw-w64-i686 g++-mingw-w64-i686",
+]
