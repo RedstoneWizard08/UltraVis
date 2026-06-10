@@ -13,7 +13,7 @@ crossbeam = { version = "0.8.4", features = ["crossbeam-channel"] }
 eyre = "0.6.12"
 ffmpeg-next = "8.1.0"
 font-kit = { version = "0.14.3", features = ["freetype"] }
-indicatif = { version = "0.18.4", features = ["futures", "rayon", "tokio"] }
+indicatif = { version = "0.18.4", features = ["rayon"] }
 itertools = "0.14.0"
 ndarray = "0.17.2"
 ordered-float = "5.3.0"

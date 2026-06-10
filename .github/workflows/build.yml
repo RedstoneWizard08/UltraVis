@@ -51,7 +51,8 @@ jobs:
                         libfontconfig1-dev \
                         libavcodec-dev \
                         libavformat-dev \
-                        libavutil-dev
+                        libavutil-dev \
+                        libavfilter-dev
 
                   mkdir -p ~/.zig
 
