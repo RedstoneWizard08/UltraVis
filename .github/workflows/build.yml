@@ -40,7 +40,18 @@ jobs:
             - name: Install dependencies
               run: |
                   sudo apt-get update
-                  sudo apt-get -y install mold
+
+                  sudo apt-get -y install \
+                        mold \
+                        build-essential \
+                        pkg-config \
+                        gcc \
+                        clang \
+                        libfreetype6-dev \
+                        libfontconfig1-dev \
+                        libavcodec-dev \
+                        libavformat-dev \
+                        libavutil-dev
 
                   mkdir -p ~/.zig
 
