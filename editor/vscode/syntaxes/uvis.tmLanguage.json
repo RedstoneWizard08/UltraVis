@@ -1,0 +1,261 @@
+{
+  "displayName": "UltraVis",
+  "name": "ultravis",
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#flag"
+    },
+    {
+      "include": "#block"
+    },
+    {
+      "include": "#expr"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "begin": "(\\s*)(\/\/)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.whitespace.comment.leading.uvis"
+        },
+        "2": {
+          "name": "punctuation.definition.comment.uvis"
+        }
+      },
+      "contentName": "comment.line.double-slash.uvis",
+      "end": "(?=$)"
+    },
+    "expr": {
+      "patterns": [
+        {
+          "match": "(\\[)\\s*(m)(\\d+)\\s*(->)\\s*(m)(\\d+)\\s*(\\])\\s*(\\d+)\\s*(\\/)\\s*(\\d+)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.measures.begin.uvis"
+            },
+            "2": {
+              "name": "keyword.operator.uvis"
+            },
+            "3": {
+              "name": "constant.numeric.measure.uvis"
+            },
+            "4": {
+              "name": "punctuation.definition.measure.uvis"
+            },
+            "5": {
+              "name": "keyword.operator.uvis"
+            },
+            "6": {
+              "name": "constant.numeric.measure.uvis"
+            },
+            "7": {
+              "name": "punctuation.definition.measures.end.uvis"
+            },
+            "8": {
+              "name": "constant.numeric.time.uvis"
+            },
+            "9": {
+              "name": "punctuation.definition.time.uvis"
+            },
+            "10": {
+              "name": "constant.numeric.time.uvis"
+            }
+          }
+        },
+        {
+          "match": "(\\d+)(x)\\s*(\\d+)\\s*(\\/)\\s*(\\d+)",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.measure.uvis"
+            },
+            "2": {
+              "name": "keyword.operator.count.uvis"
+            },
+            "3": {
+              "name": "constant.numeric.time.uvis"
+            },
+            "4": {
+              "name": "punctuation.definition.time.uvis"
+            },
+            "5": {
+              "name": "constant.numeric.time.uvis"
+            }
+          }
+        }
+      ]
+    },
+    "block": {
+      "patterns": [
+        {
+          "begin": "(:)([A-Za-z_][A-Za-z0-9_]*)\\s*(\\{)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.block.uvis"
+            },
+            "2": {
+              "name": "entity.name.block.uvis"
+            },
+            "3": {
+              "name": "punctuation.definition.block.start.uvis"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#comment"
+            },
+            {
+              "include": "#flag"
+            },
+            {
+              "include": "#block"
+            },
+            {
+              "include": "#expr"
+            }
+          ],
+          "end": "(\\})",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.block.end.uvis"
+            }
+          }
+        },
+        {
+          "begin": "(#)(repeat)\\s*(\\()(\\d+)(\\))\\s*(\\{)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.block.repeat.uvis"
+            },
+            "2": {
+              "name": "keyword.control.uvis"
+            },
+            "3": {
+              "name": "punctuation.definition.block.repeat.arg.start.uvis"
+            },
+            "4": {
+              "name": "constant.numeric.uvis"
+            },
+            "5": {
+              "name": "punctuation.definition.block.repeat.arg.end.uvis"
+            },
+            "6": {
+              "name": "punctuation.definition.block.repeat.end.uvis"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#comment"
+            },
+            {
+              "include": "#flag"
+            },
+            {
+              "include": "#block"
+            },
+            {
+              "include": "#expr"
+            }
+          ],
+          "end": "(\\})",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.block.end.uvis"
+            }
+          }
+        }
+      ]
+    },
+    "flag": {
+      "patterns": [
+        {
+          "match": "(@)\\s*(resolution)\\s*(=)\\s*(\\d+)\\s*(x)\\s*(\\d+)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.flag.uvis"
+            },
+            "2": {
+              "name": "constant.language.flag.uvis"
+            },
+            "3": {
+              "name": "punctuation.equal.flag.uvis"
+            },
+            "4": {
+              "name": "constant.numeric.uvis"
+            },
+            "5": {
+              "name": "punctuation.definition.resolution_sep.uvis"
+            },
+            "6": {
+              "name": "constant.numeric.uvis"
+            }
+          }
+        },
+        {
+          "match": "(@)\\s*(fps)\\s*(=)\\s*(\\d+)\\s*",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.flag.uvis"
+            },
+            "2": {
+              "name": "constant.language.flag.uvis"
+            },
+            "3": {
+              "name": "punctuation.equal.flag.uvis"
+            },
+            "4": {
+              "name": "constant.numeric.uvis"
+            }
+          }
+        },
+        {
+          "match": "(@)\\s*(song)\\s*(=)\\s*(\"[^\"]*\")\\s*",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.flag.uvis"
+            },
+            "2": {
+              "name": "constant.language.flag.uvis"
+            },
+            "3": {
+              "name": "punctuation.equal.flag.uvis"
+            },
+            "4": {
+              "name": "constant.string.uvis"
+            }
+          }
+        },
+        {
+          "match": "(@)\\s*(bpm)\\s*(=)\\s*(\\d+\\.\\d+)\\s*(\\*)(\\/)(\\d+)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.flag.uvis"
+            },
+            "2": {
+              "name": "constant.language.flag.uvis"
+            },
+            "3": {
+              "name": "punctuation.equal.flag.uvis"
+            },
+            "4": {
+              "name": "constant.numeric.uvis"
+            },
+            "5": {
+              "name": "keyword.control.uvis"
+            },
+            "6": {
+              "name": "punctuation.definition.bpm.uvis"
+            },
+            "7": {
+              "name": "constant.language.uvis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "scopeName": "source.uvis"
+}

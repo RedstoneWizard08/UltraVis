@@ -1,0 +1,28 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+
+# Added by cargo
+
+/target
+
+# Test
+/*.mp4
+/*.png
+/*.gz
+/*.dat
+/*.zst
+
+node_modules
+*.vsix
+editor/zed/grammars
+
+demo/audio.mp3

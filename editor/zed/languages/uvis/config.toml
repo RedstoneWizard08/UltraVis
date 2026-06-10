@@ -1,0 +1,4 @@
+name = "UltraVis"
+grammar = "uvis"
+path_suffixes = ["uvis"]
+line_comments = ["// "]

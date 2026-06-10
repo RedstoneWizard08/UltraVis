@@ -1,0 +1,63 @@
+@resolution = 1920 x 1080
+@fps = 60
+@song = "./audio.mp3"
+
+// BPM = 300 bpm (8th note)
+@bpm = 300.0 */8
+
+// I did this in FL Studio
+// Then manually moved everything over here
+// It was a pain
+// What the hell was Hakita smoking LMAO
+
+:intro {
+    // repeat the sequence of [6/8, 8/8] each for one measure 8 times
+    #repeat(8) {
+        1x 6/8
+        1x 8/8
+    }
+}
+
+:main {
+    // from measure 17 to 33 (auto calculates 33 - 17)
+    [m17 -> m33] 3/4
+    [m33 -> m41] 10/8
+
+    1x 4/4
+    1x 3/4
+    3x 4/4
+    1x 3/4
+    2x 4/4
+    8x 8/8
+
+    #repeat(4) {
+        1x 6/8
+        1x 5/4
+    }
+
+    [m65 -> m81] 4/4
+    [m81 -> m89] 3/4
+}
+
+// re-use the intro section
+&:intro
+
+:main {
+    [m105 -> m121] 3/4
+    [m121 -> m129] 10/8
+
+    1x 4/4
+    1x 3/4
+    3x 4/4
+    1x 3/4
+    2x 4/4
+    8x 8/8
+
+    #repeat(4) {
+        1x 6/8
+        1x 5/4
+    }
+
+    [m153 -> m169] 4/4
+    [m169 -> m185] 3/4
+}

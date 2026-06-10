@@ -1,0 +1,37 @@
+[package]
+name = "ultravis"
+version = "0.1.0"
+edition = "2024"
+description = "A quick and easy language and renderer for making music visualizers."
+license = "MIT"
+repository = "https://github.com/RedstoneWizard08/UltraVis"
+
+[dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+color-eyre = "0.6.5"
+crossbeam = { version = "0.8.4", features = ["crossbeam-channel"] }
+eyre = "0.6.12"
+ffmpeg-next = "8.1.0"
+font-kit = { version = "0.14.3", features = ["freetype"] }
+indicatif = { version = "0.18.4", features = ["futures", "rayon", "tokio"] }
+itertools = "0.14.0"
+ndarray = "0.17.2"
+ordered-float = "5.3.0"
+peg = "0.8.6"
+raqote = "0.8.5"
+rayon = "1.12.0"
+thiserror = "2.0.18"
+video-rs = { version = "0.11.0", features = ["ndarray"] }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+debug = true
+
+[profile.bench]
+debug = true
+
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/ultravis-{ target }"
+pkg-fmt = "bin"

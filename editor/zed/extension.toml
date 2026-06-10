@@ -1,0 +1,10 @@
+id = "ultravis"
+name = "UltraVis Language Support"
+version = "0.0.1"
+schema_version = 1
+authors = ["RedstoneWizard08"]
+description = "Syntax highlighting & bracket completions for UltraVis"
+
+[grammars.uvis]
+repository = "https://github.com/RedstoneWizard08/tree-sitter-uvis"
+rev = "93762f0775755accac5a2bb53684005e3e0a62c9"

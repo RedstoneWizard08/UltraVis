@@ -1,0 +1,40 @@
+{
+    "name": "uvis",
+    "displayName": "UltraVis Language Support",
+    "description": "Syntax highlighting for the UltraVis language.",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.120.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "scripts": {
+        "pack": "vsce package --allow-missing-repository --skip-license"
+    },
+    "contributes": {
+        "languages": [
+            {
+                "id": "uvis",
+                "aliases": [
+                    "UltraVis",
+                    "uvis"
+                ],
+                "extensions": [
+                    ".uvis"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "uvis",
+                "scopeName": "source.uvis",
+                "path": "./syntaxes/uvis.tmLanguage.json"
+            }
+        ]
+    },
+    "devDependencies": {
+        "@vscode/vsce": "^3.9.2"
+    }
+}

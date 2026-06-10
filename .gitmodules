@@ -1,0 +1,3 @@
+[submodule "editor/tree-sitter-uvis"]
+	path = editor/tree-sitter-uvis
+	url = https://github.com/RedstoneWizard08/tree-sitter-uvis
