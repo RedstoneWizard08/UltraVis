@@ -1,0 +1,37 @@
+@resolution = 1920 x 1080
+@fps = 60
+
+// dw about why there are ogg files in the soundfonts folder
+// it makes sense to me and makes it so i dont need to add more things to fl studio's browser
+@song = "/home/redstone/Documents/Soundfonts/Recreations/ultrakill audio files/8-2.ogg"
+@bpm = 185.0 */4
+
+3x 5/4
+1x 13/8
+1x 5/4
+1x 11/8
+1x 7/8
+1x 11/8
+
+[m9 -> m25] 3/4
+[m25 -> m33] 6/4
+[m33 -> m48] 3/4
+
+1x 4/4
+3x 5/4
+1x 13/8
+2x 5/4
+1x 4/4
+1x 11/8
+
+[m57 -> m65] 6/4
+
+#repeat(4) {
+    1x 5/4
+    1x 6/4
+}
+
+[m73 -> m81] 6/4
+[m81 -> m96] 3/4
+
+1x 4/4

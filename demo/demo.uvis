@@ -1,9 +1,9 @@
 @resolution = 1920 x 1080
 @fps = 60
-@song = "./audio.mp3"
+@song = "/home/redstone/Music/ULTRAKILL: FRAUD/Heaven Pierce Her - ULTRAKILL- FRAUD - 02 Spiral Out (Keep Going).mp3"
 
-// BPM = 300 bpm (8th note)
-@bpm = 300.0 */8
+// BPM = 150 bpm
+@bpm = 150.0 */4
 
 // I did this in FL Studio
 // Then manually moved everything over here

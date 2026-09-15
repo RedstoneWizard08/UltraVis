@@ -102,7 +102,7 @@ pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
         );
     }
 
-    let bpm_txt = format!("{} BPM (8th note)", info.bpm);
+    let bpm_txt = format!("{} BPM ({} note)", info.bpm, info.note.name());
     let (_, th) = measure_text(&font, 40.0, &bpm_txt);
     let (x, y) = (0.0, info.height as f32 - th);
 

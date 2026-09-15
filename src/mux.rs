@@ -18,7 +18,7 @@ pub const MAX_THREADS: usize = 30;
 
 pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf) -> Result<()> {
     // 60s / bpm
-    let beat_secs = 60.0 / opts.bpm.0;
+    let beat_secs = 60.0 / (opts.bpm.0 * 2.0);
 
     let tmp_path =
         out_path.with_extension(format!("tmp.{}", out_path.extension().unwrap().display()));

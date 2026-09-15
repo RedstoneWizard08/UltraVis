@@ -1,0 +1,21 @@
+@resolution = 1920 x 1080
+@fps = 60
+
+// Random Bullshit Go was the old name of ULTRAKILL: Amalgamations
+@song = "/home/redstone/Projects/UltraLevel/Rude/Rude/Assets/Maps/Random Bullshit Go/Non-Addressables/Music/BS-0.ogg"
+@bpm = 150.0 */4
+
+8x 5/4
+16x 4/4
+6x 2/4
+1x 4/4
+6x 2/4
+1x 4/4
+6x 2/4
+[m45 -> m65] 4/4
+1x 8/8
+[m66 -> m82] 3/4
+8x 6/4
+8x 5/4
+8x 6/4
+12x 5/4
