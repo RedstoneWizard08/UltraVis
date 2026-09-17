@@ -1,0 +1,122 @@
+@resolution = 1920 x 1080
+@fps = 60
+@song = "/home/redstone/Music/Heaven Pierce Her - ULTRAKILL- FRAUD/Heaven Pierce Her - ULTRAKILL- FRAUD - 04 No Devil Lived On.mp3"
+@bpm = 185.0 */4
+
+// This is just the default.
+// @style default {
+//     on_color = #FF0000
+//     color = #FFFFFF
+// }
+
+#style(emphasis) {
+    &:default // extend default
+
+    on_color = #00FF00
+    bold = true
+}
+
+:intro {
+    3x 5/4
+    1x 13/8
+    1x 5/4
+    1x 6/4
+    1x 3/4
+    1x 11/8
+}
+
+:intro_bridge {
+    8x 6/4
+}
+
+:chorus {
+    #repeat(4) {
+        1x 6/4
+        1x 6/4 [style: emphasis]
+    }
+
+    15x 3/4 [pattern: +--] // first appears bolder than the rest
+    1x 4/4
+}
+
+&:intro
+
+:verse2 {
+    16x 6/8
+}
+
+:verse2_bridge {
+    #repeat(4) {
+        1x 5/4 [pattern: ---++]
+        1x 6/4 [pattern: ---+++]
+    }
+}
+
+&:chorus
+&:intro
+&:intro_bridge
+&:chorus
+&:intro
+&:verse2
+&:verse2_bridge
+
+:fx_chorus {
+    #repeat(4) {
+        1x 6/4
+
+        // #effect(1x 6/4) {
+        //     start {
+        //         saturation = 0 [hold: 2] // hold for 2 beats before the lerp starts
+        //     }
+
+        //     end {
+        //         saturation = 1
+        //     }
+        // }
+
+        1x 6/4 [style: emphasis]
+    }
+
+    15x 3/4 [pattern: +--] // first appears bolder than the rest
+    1x 4/4
+}
+
+&:intro
+
+:move {
+    8x 6/4
+
+    #repeat(3) {
+        1x 6/4
+        1x 6/4 [style: emphasis]
+    }
+
+    1x 6/4
+    // #transition
+    1x 6/4 [style: emphasis]
+
+    15x 3/4 [pattern: +--] // first appears bolder than the rest
+    1x 4/4
+}
+
+:verse3 {
+    1x 5/4
+    1x 6/4
+    1x 4/4
+    1x 13/8
+    1x 5/4
+    1x 6/4
+    1x 3/4
+    1x 11/8
+}
+
+&:verse2
+&:verse2_bridge
+&:chorus
+&:intro
+
+:end {
+    1x 11/8
+    #bpm(150.0 */4)
+    18x 3/4
+}

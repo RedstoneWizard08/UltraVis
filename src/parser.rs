@@ -5,6 +5,8 @@ use eyre::Result;
 use ordered_float::OrderedFloat;
 use thiserror::Error;
 
+use crate::style::Style;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Note {
     /// */1
@@ -66,6 +68,46 @@ pub enum Flag<'a> {
     },
 }
 
+pub type ColorRgb = (u8, u8, u8);
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum StyleExpr<'a> {
+    /// `&:[name]`
+    Extend {
+        name: &'a str,
+    },
+
+    Color {
+        value: ColorRgb,
+    },
+
+    OnColor {
+        value: ColorRgb,
+    },
+
+    Bold {
+        value: bool,
+    },
+
+    Comment,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum PatternOp {
+    /// +
+    Big,
+
+    /// -
+    Small,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum MarkerFlag<'a> {
+    Style { name: &'a str },
+
+    Pattern { value: Vec<PatternOp> },
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Expr<'a> {
     NamedBlock {
@@ -82,6 +124,8 @@ pub enum Expr<'a> {
         count: usize,
         num: usize,
         den: usize,
+
+        flags: Option<Vec<MarkerFlag<'a>>>,
     },
 
     MeasureTimeMarker {
@@ -89,10 +133,22 @@ pub enum Expr<'a> {
         end: usize,
         num: usize,
         den: usize,
+
+        flags: Option<Vec<MarkerFlag<'a>>>,
     },
 
     BlockUse {
         name: &'a str,
+    },
+
+    StyleBlock {
+        name: &'a str,
+        exprs: Vec<StyleExpr<'a>>,
+    },
+
+    Bpm {
+        bpm: OrderedFloat<f32>,
+        divisor: Note,
     },
 
     Comment,
@@ -130,6 +186,10 @@ peg::parser! {
             = "@" _ "bpm" _ "=" _ bpm: _float() _ div: _note()
               { Flag::Bpm { bpm, divisor: div } }
 
+        rule _bpm_expr() -> Expr<'input>
+            = "#bpm" _ "(" _ bpm: _float() _ div: _note() _ ")"
+              { Expr::Bpm { bpm, divisor: div } }
+
         rule _qstr() -> &'input str
             = "\"" s: $([^'"']*) "\"" { s }
 
@@ -144,13 +204,32 @@ peg::parser! {
             = ":" id: _ident() _ "{" _ exprs: _exprs() _ "}"
               { Expr::NamedBlock { name: id, exprs } }
 
+        rule _pattern_op_big() -> PatternOp = "+" { PatternOp::Big }
+        rule _pattern_op_sm() -> PatternOp = "-" { PatternOp::Small }
+        rule _pattern_op() -> PatternOp = _pattern_op_big() / _pattern_op_sm()
+        rule _pattern() -> Vec<PatternOp> = _pattern_op()*
+
+        rule _marker_flag_style() -> MarkerFlag<'input>
+            = "style" _ ":" _ name: _ident()
+              { MarkerFlag::Style { name } }
+
+        rule _marker_flag_pattern() -> MarkerFlag<'input>
+            = "pattern" _ ":" _ pat: _pattern()
+              { MarkerFlag::Pattern { value: pat } }
+
+        rule _marker_flag() -> MarkerFlag<'input> = _marker_flag_style() / _marker_flag_pattern()
+
+        rule _marker_flags() -> Vec<MarkerFlag<'input>>
+            = "[" _ v: (_marker_flag() ** ",") _ "]"
+              { v }
+
         rule _marker() -> Expr<'input>
-            = count: _number() "x" _ num: _number() _ "/" _ den: _number()
-              { Expr::TimeMarker { count: count as _, num: num as _, den: den as _ } }
+            = count: _number() "x" _ num: _number() _ "/" _ den: _number() flags: (_ it: _marker_flags()? { it })
+              { Expr::TimeMarker { count: count as _, num: num as _, den: den as _, flags } }
 
         rule _measure_marker() -> Expr<'input>
-            = "[" _ "m" start: _number() _ "->" _ "m" end: _number() _ "]" _ num: _number() _ "/" _ den: _number()
-              { Expr::MeasureTimeMarker { start: start as _, end: end as _, num: num as _, den: den as _ } }
+            = "[" _ "m" start: _number() _ "->" _ "m" end: _number() _ "]" _ num: _number() _ "/" _ den: _number() flags: (_ it: _marker_flags()? { it })
+              { Expr::MeasureTimeMarker { start: start as _, end: end as _, num: num as _, den: den as _, flags } }
 
         rule _repeat() -> Expr<'input>
             = "#repeat" _ "(" _ count: _number() _ ")" _ "{" _ exprs: _exprs() _ "}"
@@ -160,7 +239,42 @@ peg::parser! {
             = "&" _ ":" name: _ident()
               { Expr::BlockUse { name } }
 
-        rule _expr_inner() -> Expr<'input> = _marker() / _measure_marker() / _repeat() / _block_use() / _comment()
+        rule _hex_color() -> ColorRgb
+            = "#" value: ['A'..='F' | 'a'..='f' | '0'..='9']*<6,6>
+              {
+                let hex = u32::from_str_radix(&String::from_iter(value), 16).expect("failed to parse hex value");
+                (((hex >> 16) & 0xFF) as u8, ((hex >> 8) & 0xFF) as u8, (hex & 0xFF) as u8)
+              }
+
+        rule _bool_true() -> bool = "true" { true }
+        rule _bool_false() -> bool = "false" { false }
+        rule _bool() -> bool = _bool_true() / _bool_false()
+
+        rule _style_expr_extend() -> StyleExpr<'input>
+            = "&" _ ":" _ name: _ident()
+              { StyleExpr::Extend { name } }
+
+        rule _style_expr_color() -> StyleExpr<'input>
+            = "color" _ "=" _ value: _hex_color()
+              { StyleExpr::Color { value } }
+
+        rule _style_expr_on_color() -> StyleExpr<'input>
+            = "on_color" _ "=" _ value: _hex_color()
+              { StyleExpr::OnColor { value } }
+
+        rule _style_expr_bold() -> StyleExpr<'input>
+            = "bold" _ "=" _ value: _bool()
+              { StyleExpr::Bold { value } }
+
+        rule _style_expr_inner() -> StyleExpr<'input> = _style_expr_extend() / _style_expr_color() / _style_expr_on_color() / _style_expr_bold() / _comment_s()
+        rule _style_expr() -> StyleExpr<'input> = it: _style_expr_inner() _comment()? { it }
+        rule _style_exprs() -> Vec<StyleExpr<'input>> = (_ it: _style_expr() ** _ { it })
+
+        rule _style() -> Expr<'input>
+            = "#style" _ "(" _ name: _ident() _ ")" _ "{" _ exprs: _style_exprs() _ "}"
+              { Expr::StyleBlock { name, exprs } }
+
+        rule _expr_inner() -> Expr<'input> = _marker() / _measure_marker() / _repeat() / _block_use() / _style() / _bpm_expr() / _comment()
         rule _expr() -> Expr<'input> = it: _expr_inner() _comment()? { it }
         rule _exprs() -> Vec<Expr<'input>> = (_ it: _expr() ** _ { it })
         rule _tl_expr() -> Expr<'input> = it: (_expr_inner() / _block()) _comment()? { it }
@@ -169,6 +283,7 @@ peg::parser! {
         rule _flag_node() -> Node<'input> = it: _flag() { Node::Flag(it) }
 
         rule _comment() -> Expr<'input> = quiet!{" "* "//" [^'\n']*} { Expr::Comment }
+        rule _comment_s() -> StyleExpr<'input> = quiet!{" "* "//" [^'\n']*} { StyleExpr::Comment }
         rule _node() -> Node<'input> = _flag_node() / _tl_expr_node()
 
         rule whitespace() = quiet!{[' ' | '\n' | '\t']*}
@@ -199,6 +314,68 @@ pub struct TimeSigItem {
     pub measures: usize,
     pub num: usize,
     pub den: usize,
+    pub flags: MarkerFlagsData,
+    pub bpm: OrderedFloat<f32>,
+    pub bpm_divisor: Note,
+}
+
+impl TimeSigItem {
+    pub fn style(&self) -> Style {
+        self.flags.style.unwrap_or_default()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MarkerFlagsData {
+    pub style: Option<Style>,
+
+    // pattern encoded as a u32, each bit 1 = big, 0 = small
+    pub pattern: Option<u32>,
+}
+
+impl MarkerFlagsData {
+    pub fn decode<'a>(
+        styles: &HashMap<String, Style>,
+        flags: &Option<Vec<MarkerFlag<'a>>>,
+    ) -> Self {
+        let mut me = Self {
+            style: None,
+            pattern: None,
+        };
+
+        if let Some(flags) = flags {
+            for flag in flags {
+                match flag {
+                    MarkerFlag::Style { name } => {
+                        if let Some(style) = styles.get(*name) {
+                            me.style = Some(*style);
+                        } else {
+                            // TODO: error handling
+                        }
+                    }
+
+                    MarkerFlag::Pattern { value } => {
+                        let mut res = 0u32;
+
+                        if value.len() > 32 {
+                            panic!("pattern length must be less than or equal to 32!");
+                        }
+
+                        for i in 0..value.len() {
+                            let v = value[i] == PatternOp::Big;
+                            let v = (v as u32) << (32 - i - 1);
+
+                            res |= v;
+                        }
+
+                        me.pattern = Some(res);
+                    }
+                }
+            }
+        }
+
+        me
+    }
 }
 
 impl fmt::Debug for TimeSigItem {
@@ -208,7 +385,9 @@ impl fmt::Debug for TimeSigItem {
 }
 
 fn process_exprs<'a>(
+    opts: &mut ProgramOptions,
     out: &mut Vec<TimeSigItem>,
+    styles: &mut HashMap<String, Style>,
     input: Vec<Expr<'a>>,
     blocks: &HashMap<&'a str, Vec<Expr<'a>>>,
     is_root: bool,
@@ -218,7 +397,7 @@ fn process_exprs<'a>(
             Expr::Repeat { count, exprs } => {
                 let mut new = Vec::new();
 
-                process_exprs(&mut new, exprs, blocks, false)?;
+                process_exprs(opts, &mut new, styles, exprs, blocks, false)?;
 
                 for _ in 0..count {
                     out.extend(new.clone());
@@ -229,16 +408,24 @@ fn process_exprs<'a>(
                 let block = blocks.get(name).ok_or(Error::MissingBlock(name.into()))?;
                 let mut new = Vec::new();
 
-                process_exprs(&mut new, block.clone(), blocks, false)?;
+                process_exprs(opts, &mut new, styles, block.clone(), blocks, false)?;
 
                 out.extend(new);
             }
 
-            Expr::TimeMarker { count, num, den } => {
+            Expr::TimeMarker {
+                count,
+                num,
+                den,
+                flags,
+            } => {
                 out.push(TimeSigItem {
                     measures: count,
                     num,
                     den,
+                    flags: MarkerFlagsData::decode(&styles, &flags),
+                    bpm: opts.bpm,
+                    bpm_divisor: opts.bpm_divisor,
                 });
             }
 
@@ -247,11 +434,15 @@ fn process_exprs<'a>(
                 end,
                 num,
                 den,
+                flags,
             } => {
                 out.push(TimeSigItem {
                     measures: end - start,
                     num,
                     den,
+                    flags: MarkerFlagsData::decode(&styles, &flags),
+                    bpm: opts.bpm,
+                    bpm_divisor: opts.bpm_divisor,
                 });
             }
 
@@ -261,10 +452,20 @@ fn process_exprs<'a>(
                 } else {
                     let mut new = Vec::new();
 
-                    process_exprs(&mut new, exprs, blocks, false)?;
+                    process_exprs(opts, &mut new, styles, exprs, blocks, false)?;
 
                     out.extend(new);
                 }
+            }
+
+            Expr::StyleBlock { name, exprs } => {
+                let s = Style::decode(&styles, &exprs);
+                styles.insert(name.to_string(), s);
+            }
+
+            Expr::Bpm { bpm, divisor } => {
+                opts.bpm = bpm;
+                opts.bpm_divisor = divisor;
             }
 
             Expr::Comment => {}
@@ -329,10 +530,6 @@ fn simplify<'a>(
                 (exprs, flags)
             });
 
-    let mut items = Vec::new();
-
-    process_exprs(&mut items, exprs, &blocks, true)?;
-
     let mut opts = ProgramOptions::default();
 
     for flag in flags {
@@ -360,6 +557,17 @@ fn simplify<'a>(
             }
         }
     }
+
+    let mut items = Vec::new();
+
+    process_exprs(
+        &mut opts.clone(),
+        &mut items,
+        &mut HashMap::new(),
+        exprs,
+        &blocks,
+        true,
+    )?;
 
     Ok((items, opts))
 }

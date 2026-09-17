@@ -1,4 +1,4 @@
-use crate::parser::{Note, TimeSigItem};
+use crate::parser::TimeSigItem;
 use font_kit::{font::Font, loader::Loader};
 use ndarray::Array3;
 use raqote::{DrawOptions, DrawTarget, Point, SolidSource, Source};
@@ -23,11 +23,13 @@ fn measure_text(font: &Font, size: f32, s: &str) -> (f32, f32) {
 }
 
 pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
+    let font_size = 72.0;
+
+    let style = info.time.style();
     let font = Loader::from_bytes(Arc::new(FONT.to_vec()), 0).unwrap();
     let beat = info.beat;
     let next = info.next;
 
-    let font_size = 72.0;
     let cx = info.width as f32 / 2.0;
     let cy = info.height as f32 / 2.0;
 
@@ -64,14 +66,23 @@ pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
     let mut cur_x = x;
 
     for n in 1..=info.time.num {
+        let mut color = if n == beat + 1 {
+            style.on()
+        } else {
+            style.off()
+        };
+
+        if let Some(pat) = info.time.flags.pattern {
+            let bit = (pat >> (32 - (n - 1) - 1)) & 1;
+
+            if bit == 0 {
+                // darken the pixel by manipulating the unpremultiplied alpha
+                color = SolidSource::from_unpremultiplied_argb(100, color.r, color.g, color.b);
+            }
+        }
+
         let txt = format!("{n} ");
         let (tw, _) = measure_text(&font, font_size, &txt);
-
-        let color = if n == beat + 1 {
-            SolidSource::from_unpremultiplied_argb(255, 255, 0, 0)
-        } else {
-            SolidSource::from_unpremultiplied_argb(255, 255, 255, 255)
-        };
 
         dt.draw_text(
             &font,
@@ -85,7 +96,9 @@ pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
         cur_x += tw;
     }
 
-    if let Some(next) = next {
+    if let Some(next) = next
+        && (next.num != info.time.num || next.den != info.time.den)
+    {
         let next_txt = format!("Next: {}/{}", next.num, next.den);
         let (tw, th) = measure_text(&font, 40.0, &next_txt);
         let (x, y) = (info.width as f32 - tw, info.height as f32 - th);
@@ -102,9 +115,14 @@ pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
         );
     }
 
-    let bpm_txt = format!("{} BPM ({} note)", info.bpm, info.note.name());
+    let bpm_txt = format!(
+        "{} BPM ({} note)",
+        info.time.bpm,
+        info.time.bpm_divisor.name()
+    );
+
     let (_, th) = measure_text(&font, 40.0, &bpm_txt);
-    let (x, y) = (0.0, info.height as f32 - th);
+    let (x, y) = (40.0, info.height as f32 - th);
 
     dt.draw_text(
         &font,
@@ -148,6 +166,4 @@ pub struct FrameInfo {
     pub pos: Time,
     pub width: usize,
     pub height: usize,
-    pub bpm: f32,
-    pub note: Note,
 }

@@ -1,0 +1,2 @@
+[lint.rules]
+tables-out-of-order = "off"

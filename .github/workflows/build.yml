@@ -38,7 +38,15 @@ jobs:
                         build-essential \
                         pkg-config \
                         gcc \
-                        clang
+                        clang \
+                        libfontconfig1-dev \
+                        ffmpeg \
+                        libavcodec-dev \
+                        libavdevice-dev \
+                        libavfilter-dev \
+                        libavformat-dev \
+                        libavresample-dev \
+                        libavutil-dev
 
                   mkdir -p ~/.zig
 

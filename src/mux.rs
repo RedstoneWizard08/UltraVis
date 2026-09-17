@@ -17,9 +17,6 @@ pub const MAX_FRAME_QUEUE: usize = 30;
 pub const MAX_THREADS: usize = 30;
 
 pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf) -> Result<()> {
-    // 60s / bpm
-    let beat_secs = 60.0 / (opts.bpm.0 * 2.0);
-
     let tmp_path =
         out_path.with_extension(format!("tmp.{}", out_path.extension().unwrap().display()));
 
@@ -28,6 +25,9 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
     let mut ps = Time::zero();
 
     for (pos, time) in times.iter().enumerate() {
+        // 60s / bpm
+        let beat_secs = 60.0 / (time.bpm.0 * 2.0);
+
         for m in 0..time.measures {
             let next = if m == time.measures - 1 && pos as usize + 1 < times.len() {
                 Some(times[pos + 1])
@@ -45,8 +45,6 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
                     pos: ps,
                     width: opts.width,
                     height: opts.height,
-                    bpm: opts.bpm.0,
-                    note: opts.bpm_divisor,
                 };
 
                 ps = ps.aligned_with(Time::from_secs(frame.wait)).add();
@@ -153,6 +151,8 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
     } else {
         fs::rename(&tmp_path, &out_path)?;
     }
+
+    fs::remove_file(&tmp_path)?;
 
     Ok(())
 }
