@@ -3,4 +3,4 @@
 
 [target.'cfg(target_os = "linux")']
 linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold", "-C", "link-arg=-Wl,--no-rosegment"]
+rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
