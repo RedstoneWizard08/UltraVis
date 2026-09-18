@@ -46,7 +46,12 @@ jobs:
                         gcc-mingw-w64-x86-64 \
                         gcc-mingw-w64-i686 \
                         gcc-aarch64-linux-gnu \
-                        meson
+                        binutils-mingw-w64-x86-64 \
+                        binutils-mingw-w64-i686 \
+                        binutils-aarch64-linux-gnu \
+                        meson \
+                        make \
+                        ninja-build
 
                   mkdir -p ~/.zig
 
