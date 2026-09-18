@@ -24,12 +24,12 @@ wheels/
 node_modules
 *.vsix
 editor/zed/grammars
+/editor
+/demo
+/.vscode
+/.github
 
 demo/audio.mp3
 
 /perf.*
 /flamegraph.svg
-
-/cross/prefixes
-/cross/build
-/cross/source

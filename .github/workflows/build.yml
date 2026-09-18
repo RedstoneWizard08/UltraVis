@@ -5,7 +5,6 @@ jobs:
     build:
         name: Build
         runs-on: ubuntu-latest
-        container: jrottenberg/ffmpeg:9.0-ubuntu
 
         strategy:
             fail-fast: false
@@ -15,14 +14,11 @@ jobs:
                       windows: false
                     - target: aarch64-unknown-linux-gnu
                       windows: false
-                    - target: x86_64-unknown-linux-musl
-                      windows: false
-                    - target: aarch64-unknown-linux-musl
-                      windows: false
-                    - target: x86_64-apple-darwin
-                      windows: false
-                    - target: aarch64-apple-darwin
-                      windows: false
+                    # Don't have the time or resources to set it up, sorry!
+                    # - target: x86_64-apple-darwin
+                    #   windows: false
+                    # - target: aarch64-apple-darwin
+                    #   windows: false
                     - target: x86_64-pc-windows-gnu
                       windows: true
                     - target: i686-pc-windows-gnu
@@ -33,9 +29,9 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  apt-get update
+                  sudo apt-get update
 
-                  apt-get -y install \
+                  sudo apt-get -y install \
                         mold \
                         build-essential \
                         pkg-config \
@@ -45,7 +41,11 @@ jobs:
                         curl \
                         tar \
                         gzip \
-                        bzip2
+                        bzip2 \
+                        mingw-w64 \
+                        gcc-mingw-w64-x86-64 \
+                        gcc-mingw-w64-i686 \
+                        gcc-aarch64-linux-gnu
 
                   mkdir -p ~/.zig
 
@@ -54,7 +54,7 @@ jobs:
                     tar -xJ -C ~/.zig --strip-components 1
 
                   chmod a+rx ~/.zig/zig
-                  ln -sf ~/.zig/zig /usr/local/bin/zig
+                  sudo ln -sf ~/.zig/zig /usr/local/bin/zig
 
             - name: Setup Rust
               uses: dtolnay/rust-toolchain@stable
@@ -94,10 +94,16 @@ jobs:
             - name: Install cross
               run: |
                   cargo install cross --force --git https://github.com/cross-rs/cross --rev 29d00c7803f221f1b3f35e561b03792368fb8339
+            
+            - name: Build deps
+              run: bash scripts/build-deps.sh ${{ matrix.target }}
 
             - name: Build
               if: matrix.windows != true
               run: |
+                  export FFMPEG_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
+                  export PKG_CONFIG_SYSROOT_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
+
                   cargo zigbuild --target ${{ matrix.target }}
                   cargo zigbuild --release --target ${{ matrix.target }}
 
@@ -109,6 +115,9 @@ jobs:
             - name: Build (windows)
               if: matrix.windows == true
               run: |
+                  export FFMPEG_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
+                  export PKG_CONFIG_SYSROOT_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
+
                   cross build --target ${{ matrix.target }}
                   cross build --release --target ${{ matrix.target }}
 

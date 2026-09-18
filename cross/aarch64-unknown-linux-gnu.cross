@@ -1,0 +1,31 @@
+[constants]
+mfam  = 'aarch64'
+msys  = 'linux'
+mabi  = 'gnu'
+chain = mfam +'-'+ msys +'-'+ mabi
+bin   = '/usr/bin'
+
+[binaries]
+c         = bin / chain + '-gcc'
+cpp       = bin / chain + '-g++'
+ld        = bin / chain + '-ld'
+ar        = bin / chain + '-ar'
+as        = bin / chain + '-as'
+nm        = bin / chain + '-nm'
+size      = bin / chain + '-size'
+objdump   = bin / chain + '-objdump'
+objcopy   = bin / chain + '-objcopy'
+ranlib    = bin / chain + '-ranlib'
+readelf   = bin / chain + '-readelf'
+elfedit   = bin / chain + '-elfedit'
+strings   = bin / chain + '-strings'
+strip     = bin / chain + '-strip'
+gdb       = bin / chain + '-gdb'
+dwp       = bin / chain + '-dwp'
+addr2line = bin / chain + '-addr2line'
+
+[host_machine]
+system     = msys
+cpu = mfam
+cpu_family = mfam
+endian     = 'little'
