@@ -4,14 +4,18 @@ use crate::{
 };
 use crossbeam::channel::bounded;
 use eyre::Result;
-use ffmpeg_next::{format, media::Type};
+use ffmpeg_next::{
+    Dictionary,
+    format::{self, Pixel},
+    media::Type,
+};
 use indicatif::ProgressIterator;
 use rayon::{
     ThreadPoolBuilder,
     iter::{ParallelBridge, ParallelIterator},
 };
 use std::{collections::BTreeMap, fs, path::PathBuf};
-use video_rs::{Time, encode::Settings};
+use video_rs::{Options, Time, encode::Settings};
 
 pub const MAX_FRAME_QUEUE: usize = 30;
 pub const MAX_THREADS: usize = 30;
@@ -55,10 +59,15 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
         }
     }
 
-    let mut enc = video_rs::Encoder::new(
-        tmp_path.clone(),
-        Settings::preset_h264_yuv420p(opts.width, opts.height, false),
-    )?;
+    let mut options_dict = Dictionary::new();
+
+    options_dict.set("preset", "ultrafast");
+
+    let options = Options(options_dict);
+    let settings = Settings::preset_h264_custom(opts.width, opts.height, Pixel::YUV420P, options);
+    let mut enc = video_rs::Encoder::new(tmp_path.clone(), settings)?;
+
+    let t_enc = enc.thread_cx();
 
     let (tx, rx) = bounded(MAX_FRAME_QUEUE);
 
@@ -73,12 +82,15 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
             .enumerate()
             .par_bridge()
             .map_with(tx.clone(), |tx, (i, f)| {
-                let data = render_frame(f);
+                let data =
+                    render_frame(f, &t_enc).expect(&format!("failed to render frame #{}", f.idx));
 
                 tx.send((i, data)).unwrap();
             })
             .collect::<Vec<_>>();
     });
+
+    enc.start_encoder_thread();
 
     let mut buf = BTreeMap::new();
     let mut pos = 0;
@@ -86,14 +98,14 @@ pub fn mux_video(times: &[TimeSigItem], opts: &ProgramOptions, out_path: PathBuf
     while let Ok((i, data)) = rx.recv() {
         buf.insert(i, data);
 
-        while let Some((info, data)) = buf.remove(&pos) {
-            enc.encode(&data, info.pos)?;
+        while let Some((_info, data)) = buf.remove(&pos) {
+            enc.write_frame(data)?;
             pos += 1;
         }
     }
 
-    for (info, data) in buf.into_values() {
-        enc.encode(&data, info.pos)?;
+    for (_info, data) in buf.into_values() {
+        enc.write_frame(data)?;
     }
 
     handle.join().unwrap();

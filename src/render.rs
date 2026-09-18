@@ -1,9 +1,10 @@
 use crate::parser::TimeSigItem;
+use eyre::Result;
 use font_kit::{font::Font, loader::Loader};
 use ndarray::Array3;
 use raqote::{DrawOptions, DrawTarget, Point, SolidSource, Source};
 use std::sync::Arc;
-use video_rs::Time;
+use video_rs::{Time, encode::ThreadEncoderCx, frame::RawFrame};
 
 const FONT: &[u8] = include_bytes!("../res/VCR_OSD_MONO_1.001.ttf");
 
@@ -22,7 +23,7 @@ fn measure_text(font: &Font, size: f32, s: &str) -> (f32, f32) {
     (sum, (font.metrics().bounding_box.height() / upe) * size)
 }
 
-pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
+pub fn render_frame(info: FrameInfo, enc: &ThreadEncoderCx) -> Result<(FrameInfo, RawFrame)> {
     let font_size = 72.0;
 
     let style = info.time.style();
@@ -146,12 +147,11 @@ pub fn render_frame(info: FrameInfo) -> (FrameInfo, Array3<u8>) {
         })
         .collect::<Vec<_>>();
 
-    (
-        info,
-        Array3::from_shape_fn((info.height, info.width, 3), |(y, x, c)| {
-            vec[(info.width as usize * y) + x][c]
-        }),
-    )
+    let data = Array3::from_shape_fn((info.height, info.width, 3), |(y, x, c)| {
+        vec[(info.width as usize * y) + x][c]
+    });
+
+    Ok((info, enc.prepare_frame(&data, info.pos)?))
 }
 
 #[derive(Debug, Clone, Copy)]

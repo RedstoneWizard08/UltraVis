@@ -44,9 +44,7 @@ jobs:
                         libavcodec-dev \
                         libavdevice-dev \
                         libavfilter-dev \
-                        libavformat-dev \
-                        libavresample-dev \
-                        libavutil-dev
+                        libavformat-dev
 
                   mkdir -p ~/.zig
 

@@ -1,3 +1,7 @@
+[workspace]
+resolver = "3"
+members = [".", "thirdparty/*"]
+
 [package]
 name = "ultravis"
 version = "0.1.0"
@@ -20,7 +24,7 @@ peg = "0.8.6"
 raqote = "0.8.5"
 rayon = "1.12.0"
 thiserror = "2.0.20"
-video-rs = { version = "0.12.0", features = ["ndarray"] }
+video-rs = { path = "./thirdparty/video-rs", features = ["ndarray"] }
 
 [profile.release]
 opt-level = 3
