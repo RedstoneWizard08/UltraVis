@@ -51,7 +51,8 @@ jobs:
                         binutils-aarch64-linux-gnu \
                         meson \
                         make \
-                        ninja-build
+                        ninja-build \
+                        nasm
 
                   mkdir -p ~/.zig
 
