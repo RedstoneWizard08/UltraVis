@@ -18,7 +18,7 @@ meson setup \
     --reconfigure \
     --prefix "$PREFIX" \
     --buildtype release \
-    --cross-file "$CWD/cross/$TARGET.cross"  \
+    --cross-file "$CWD/cross/$TARGET.cross" \
     --strip \
     --default-library both \
     "$CWD/cross/build/$TARGET/freetype" \
