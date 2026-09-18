@@ -32,9 +32,9 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  sudo apt-get update
+                  apt-get update
 
-                  sudo apt-get -y install \
+                  apt-get -y install \
                         mold \
                         build-essential \
                         pkg-config \
@@ -49,7 +49,7 @@ jobs:
                     tar -xJ -C ~/.zig --strip-components 1
 
                   chmod a+rx ~/.zig/zig
-                  sudo ln -sf ~/.zig/zig /usr/local/bin/zig
+                  ln -sf ~/.zig/zig /usr/local/bin/zig
 
             - name: Cache
               uses: actions/cache@v4
