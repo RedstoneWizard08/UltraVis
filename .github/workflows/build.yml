@@ -5,6 +5,7 @@ jobs:
     build:
         name: Build
         runs-on: ubuntu-latest
+        container: jrottenberg/ffmpeg:9.0-ubuntu
         strategy:
             fail-fast: false
             matrix:
@@ -39,12 +40,7 @@ jobs:
                         pkg-config \
                         gcc \
                         clang \
-                        libfontconfig1-dev \
-                        ffmpeg \
-                        libavcodec-dev \
-                        libavdevice-dev \
-                        libavfilter-dev \
-                        libavformat-dev
+                        libfontconfig1-dev
 
                   mkdir -p ~/.zig
 
