@@ -6,6 +6,7 @@ jobs:
         name: Build
         runs-on: ubuntu-latest
         container: jrottenberg/ffmpeg:9.0-ubuntu
+
         strategy:
             fail-fast: false
             matrix:
@@ -30,6 +31,9 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            - name: Setup Rust
+              uses: dtolnay/rust-toolchain@stable
+
             - name: Install dependencies
               run: |
                   apt-get update
@@ -40,7 +44,11 @@ jobs:
                         pkg-config \
                         gcc \
                         clang \
-                        libfontconfig1-dev
+                        libfontconfig1-dev \
+                        curl \
+                        tar \
+                        gzip \
+                        bzip2
 
                   mkdir -p ~/.zig
 
