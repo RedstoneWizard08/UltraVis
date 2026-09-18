@@ -52,7 +52,8 @@ jobs:
                         meson \
                         make \
                         ninja-build \
-                        nasm
+                        nasm \
+                        wine64-tools
 
                   mkdir -p ~/.zig
 
