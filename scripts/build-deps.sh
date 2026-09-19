@@ -12,7 +12,7 @@ CWD="$(pwd)"
 PREFIX="$CWD/cross/prefixes/$TARGET"
 
 [[ ! -d "$CWD/cross/source/freetype" ]] && \
-    git clone --depth 1 -b VER-2-14-3 https://github.com/freetype/freetype "$CWD/cross/source/freetype"
+    git clone --depth 1 -b VER-2-14-3 https://gitlab.freedesktop.org/freetype/freetype "$CWD/cross/source/freetype"
 
 meson setup \
     --reconfigure \
@@ -25,6 +25,23 @@ meson setup \
     "$CWD/cross/source/freetype"
 
 ninja -C "$CWD/cross/build/$TARGET/freetype" install
+
+if [[ "$TARGET" = "aarch64-unknown-linux-gnu" ]]; then
+    [[ ! -d "$CWD/cross/source/fontconfig" ]] && \
+        git clone --depth 1 -b 2.18.3 https://gitlab.freedesktop.org/fontconfig/fontconfig "$CWD/cross/source/fontconfig"
+
+    meson setup \
+        --reconfigure \
+        --prefix "$PREFIX" \
+        --buildtype release \
+        --cross-file "$CWD/cross/$TARGET.cross" \
+        --strip \
+        --default-library both \
+        "$CWD/cross/build/$TARGET/fontconfig" \
+        "$CWD/cross/source/fontconfig"
+
+    ninja -C "$CWD/cross/build/$TARGET/fontconfig" install
+fi
 
 [[ ! -d "$CWD/cross/source/ffmpeg" ]] && \
     git clone --depth 1 -b n9.0.1 https://github.com/ffmpeg/ffmpeg "$CWD/cross/source/ffmpeg"
@@ -40,6 +57,7 @@ FFMPEG_ARGS=(
     --disable-programs
     --disable-doc
     --extra-cxxflags='-D_GLIBCXX_USE_CXX11_ABI=0'
+    --disable-d3d12va
 )
 
 [[ ! -f "$FFMPEG_BUILD/Makefile" ]] && case "$TARGET" in

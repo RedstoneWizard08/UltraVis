@@ -1,9 +1,7 @@
 fn main() {
-    // println!("cargo:rustc-link-lib=static=stdc++");
-
     #[cfg(unix)]
     {
-        use build_rs::input::{cargo_cfg_target_arch, cargo_cfg_windows};
+        use build_rs::input::{cargo_cfg_target_arch, cargo_cfg_unix, cargo_cfg_windows};
 
         if cargo_cfg_windows() {
             if cargo_cfg_target_arch() == "x86_64" {
@@ -24,6 +22,10 @@ fn main() {
             println!("cargo::rustc-link-lib=security");
             println!("cargo::rustc-link-lib=mincore");
             println!("cargo::rustc-link-lib=shcore");
+        } else if cargo_cfg_unix() {
+            if cargo_cfg_target_arch() == "aarch64" {
+                println!("cargo::rustc-link-lib=png16");
+            }
         }
     }
 }
