@@ -46,6 +46,7 @@ jobs:
                         gcc-mingw-w64-x86-64 \
                         gcc-mingw-w64-i686 \
                         gcc-aarch64-linux-gnu \
+                        g++-aarch64-linux-gnu \
                         binutils-mingw-w64-x86-64 \
                         binutils-mingw-w64-i686 \
                         binutils-aarch64-linux-gnu \
