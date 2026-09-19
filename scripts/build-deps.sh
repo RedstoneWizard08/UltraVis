@@ -57,7 +57,6 @@ FFMPEG_ARGS=(
     --disable-programs
     --disable-doc
     --extra-cxxflags='-D_GLIBCXX_USE_CXX11_ABI=0'
-    --disable-d3d12va
 )
 
 [[ ! -f "$FFMPEG_BUILD/Makefile" ]] && case "$TARGET" in
