@@ -28,6 +28,7 @@ fn main() {
             } else if cargo_cfg_target_arch() == "x86_64" {
                 println!("cargo::rustc-link-lib=z");
                 println!("cargo::rustc-link-lib=bz2");
+                println!("cargo::rustc-link-lib=lz4");
             }
         }
     }
