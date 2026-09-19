@@ -20,6 +20,7 @@ readelf = bin / chain + '-readelf'
 strings = bin / chain + '-strings'
 strip   = bin / chain + '-strip'
 gdb     = bin / chain + '-gdb'
+windres = bin / chain + '-windres'
 
 [host_machine]
 system     = 'windows'

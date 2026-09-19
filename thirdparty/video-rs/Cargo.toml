@@ -16,6 +16,7 @@ ffmpeg-next = { version = "=9.0.0", features = [
     "codec",
     "software-resampling",
     "software-scaling",
+    "static",
 ] }
 ndarray = { version = "=0.17.2", optional = true }
 tracing = "=0.1.44"
