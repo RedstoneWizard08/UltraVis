@@ -36,7 +36,11 @@ FFMPEG_BUILD="$CWD/cross/build/$TARGET/ffmpeg"
 
 cd "$FFMPEG_BUILD" || exit 1
 
-FFMPEG_ARGS="--disable-programs --disable-doc --extra-cxxflags='-D_GLIBCXX_USE_CXX11_ABI=0'"
+FFMPEG_ARGS=(
+    --disable-programs
+    --disable-doc
+    --extra-cxxflags='-D_GLIBCXX_USE_CXX11_ABI=0'
+)
 
 [[ ! -f "$FFMPEG_BUILD/Makefile" ]] && case "$TARGET" in
     x86_64-pc-windows-*) "$FFMPEG/configure" --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- --arch=x86_64 $FFMPEG_ARGS --prefix="$PREFIX" ;;

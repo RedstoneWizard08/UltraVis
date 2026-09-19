@@ -112,8 +112,8 @@ jobs:
                   export FFMPEG_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
                   export PKG_CONFIG_SYSROOT_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
 
-                  cargo zigbuild --target ${{ matrix.target }}
-                  cargo zigbuild --release --target ${{ matrix.target }}
+                  cargo build --target ${{ matrix.target }}
+                  cargo build --release --target ${{ matrix.target }}
 
                   mkdir bin
 
