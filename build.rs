@@ -25,6 +25,9 @@ fn main() {
         } else if cargo_cfg_unix() {
             if cargo_cfg_target_arch() == "aarch64" {
                 println!("cargo::rustc-link-lib=png16");
+            } else if cargo_cfg_target_arch() == "x86_64" {
+                println!("cargo::rustc-link-lib=z");
+                println!("cargo::rustc-link-lib=bz2");
             }
         }
     }

@@ -118,10 +118,8 @@ jobs:
             - name: Build
               # if: matrix.windows != true
               run: |
-                  if [[ "${{ matrix.target }}" != "x86_64-unknown-linux-gnu" ]]; then
-                      export FFMPEG_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
-                      export PKG_CONFIG_SYSROOT_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
-                  fi
+                  export FFMPEG_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
+                  export PKG_CONFIG_SYSROOT_DIR="$(pwd)/cross/prefixes/${{ matrix.target }}"
 
                   cargo build --release --target ${{ matrix.target }}
 
