@@ -49,9 +49,7 @@ jobs:
                         binutils-mingw-w64-x86-64 \
                         binutils-mingw-w64-i686 \
                         binutils-aarch64-linux-gnu \
-                        meson \
                         make \
-                        ninja-build \
                         nasm \
                         wine64-tools
 
@@ -63,6 +61,14 @@ jobs:
 
                   # chmod a+rx ~/.zig/zig
                   # sudo ln -sf ~/.zig/zig /usr/local/bin/zig
+            
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.x'
+
+            - name: Install meson and ninja
+              run: python -m pip install meson ninja
 
             - name: Setup Rust
               uses: dtolnay/rust-toolchain@stable
